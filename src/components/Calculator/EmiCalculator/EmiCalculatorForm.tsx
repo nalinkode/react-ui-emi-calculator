@@ -10,8 +10,8 @@ const EmiCalculatorForm = (props: any) => {
     const { setResults } = props || ''
     const [userValues, setUserValues] = React.useState({
         amount: 0,
-        interest: 0,
-        years: 0,
+        interest: 8,
+        years: 30,
     });
 
     const handleInputChange = (name: any, value: any) => {
@@ -20,14 +20,19 @@ const EmiCalculatorForm = (props: any) => {
 
     React.useEffect(() => {
         const { amount, interest, years } = userValues || ''
-        if (amount > 0 && interest > 0 && years > 0) {
-            calculateResults(userValues)
-        }
+        // if (amount > 0 && interest > 0 && years > 0) {
+            const userLoanData = {
+                pAmount : amount * 100000,
+                interest,
+                years
+            }
+            calculateResults(userLoanData)
+        //}
     }, [userValues])
 
-    const calculateResults = (userValues: any) => {
-        const { amount, interest, years } = userValues || ''
-        const userAmount = Number(amount);
+    const calculateResults = (loanData: any) => {
+        const { pAmount, interest, years } = loanData || ''
+        const userAmount = Number(pAmount);
         const calculatedInterest = Number(interest) / 100 / 12;
         const calculatedPayments = Number(years) * 12;
         const x = Math.pow(1 + calculatedInterest, calculatedPayments);
@@ -43,7 +48,7 @@ const EmiCalculatorForm = (props: any) => {
                 monthlyPayment: monthlyPaymentCalculated,
                 totalPayment: totalPaymentCalculated,
                 totalInterest: totalInterestCalculated,
-                principleAmount: amount,
+                principleAmount: pAmount,
                 isResult: true,
             });
         }
@@ -95,13 +100,18 @@ const EmiCalculatorForm = (props: any) => {
                                     onChange={(val: any) => handleInputChange('interest', val)}
                                     graduated
                                     renderMark={mark => {
-                                        return <div className=''>{mark + ' %'}</div>;
+                                        if ([3, 9,  15, 21, 27].includes(mark)) {
+                                            return <div>{mark + ' %'} </div>;
+                                        }
+                                        return null;
                                     }}
-                                    step={20}
+                                    step={3}
+                                    min={0}
+                                    max={30}
                                 />
                                 <InputNumber
                                     min={0}
-                                    max={100}
+                                    max={30}
                                     placeholder="%"
                                     className="mt-[30px]"
                                     value={userValues.interest}
@@ -121,13 +131,18 @@ const EmiCalculatorForm = (props: any) => {
                                     onChange={(val: any) => handleInputChange('years', val)}
                                     graduated
                                     renderMark={mark => {
-                                        return <div className=''>{mark + ' Yr'}</div>
+                                        if ([4, 12, ,20,  28, 36 ].includes(mark)) {
+                                            return <div>{mark + ' Yr'} </div>;
+                                        }
+                                        return null;
                                     }}
-                                    step={20}
+                                    step={4}
+                                    min={0}
+                                    max={40}
                                 />
                                 <InputNumber
                                     min={0}
-                                    max={100}
+                                    max={40}
                                     className="mt-[30px]"
                                     placeholder="Years"
                                     value={userValues.years}
